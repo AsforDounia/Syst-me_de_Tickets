@@ -27,7 +27,7 @@ class CategoryController extends Controller
 
         return redirect()->route('admin.categories')->with('success', 'Category added successfully!');
     }
-    
+
 
     public function edit(Category $category)
     {
@@ -37,16 +37,30 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request)
     {
-        //
+
+
+        $request->validate([
+            'id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+
+        ]);
+
+        $category = Category::findOrFail($request->id);
+
+        $category->name = $request->name;
+        $category->description = $request->description;
+        $category->save();
+
+        return redirect()->back()->with('success', 'Catégorie modifiée avec succès!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
+    public function destroy($id)
     {
-        //
+        $category = Category::findOrFail($id);
+        $category->delete();
+        return redirect()->back()->with('success', 'Catégorie supprimée avec succès!');
     }
 }

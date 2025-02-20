@@ -17,9 +17,9 @@ return new class extends Migration
             $table->text('description');
             $table->enum('status', ['open', 'in_progress', 'resolved', 'closed']);
             $table->enum('priority', ['low', 'medium', 'high', 'urgent']);
-            $table->foreignId('category_id')->constrained();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('agent_id')->nullable()->constrained('users');
+            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');;
+            $table->foreignId('agent_id')->nullable()->constrained('users')->onDelete('SET NULL');
             $table->timestamp('created_at');
             $table->timestamp('updated_at');
             $table->timestamp('closed_at')->nullable();

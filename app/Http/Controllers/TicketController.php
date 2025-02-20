@@ -94,18 +94,18 @@ class TicketController extends Controller
         return view('tickets.show', compact('ticket'));
     }
 
-    public function changeStatus(Request $request, Ticket $ticket)
-    {
-        $this->authorize('update', $ticket);
+    // public function changeStatus(Request $request, Ticket $ticket)
+    // {
+    //     // $this->authorize('update', $ticket);
 
-        $validated = $request->validate([
-            'status' => 'required|in:open,in_progress,resolved,closed'
-        ]);
+    //     $validated = $request->validate([
+    //         'status' => 'required|in:open,in_progress,resolved,closed'
+    //     ]);
 
-        $ticket->update($validated);
+    //     $ticket->update($validated);
 
-        return back()->with('success', 'Ticket status updated successfully');
-    }
+    //     return back()->with('success', 'Ticket status updated successfully');
+    // }
     /**
      * Remove the specified resource from storage.
      */
@@ -113,4 +113,45 @@ class TicketController extends Controller
     {
         //
     }
+
+
+    public function assignCategory(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+        $ticket->update($validated);
+
+        return redirect()->back()->with('success', 'Catégorie assignée avec succès!');
+    }
+
+    public function assignAgent(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'agent_id' => 'required|exists:categories,id',
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+        $ticket->update($validated);
+
+        return redirect()->back()->with('success', 'Agent assignée avec succès!');
+    }
+
+    public function changeStatus(Request $request, $id)
+    {
+        // $this->authorize('update', $ticket);
+
+        $validated = $request->validate([
+            'status' => 'required|in:open,in_progress,resolved,closed'
+        ]);
+        $ticket = Ticket::findOrFail($id);
+        $ticket->update($validated);
+
+        return back()->with('success', 'Ticket status updated successfully');
+    }
+
+
+
 }

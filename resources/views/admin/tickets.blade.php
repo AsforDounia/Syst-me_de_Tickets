@@ -16,6 +16,12 @@
         openStatus(ticketId) {
             this.currentTicketId = ticketId;
             this.statusModal = true;
+        },
+        categoryModal: false,
+            currentTicketId: null,
+            openCategoryModal(ticketId) {
+                this.currentTicketId = ticketId;
+                this.categoryModal = true;
         }
     }">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -77,11 +83,23 @@
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $ticket->id }}</td>
                                     <td class="px-6 py-4">{{ $ticket->user?->name ?? 'Non assigné' }}</td>
                                     <td class="px-6 py-4">{{ $ticket->description }}</td>
-                                    <td class="px-6 py-4">{{ $ticket->category->name }}</td>
+                                    <td class="px-6 py-4">
+                                        {{-- {{ $ticket->category ? $ticket->category->name : 'null' }} --}}
+                                        @if($ticket->category)
+                                        <button @click="openCategoryModal({{ $ticket->id }})" type="button" class="text-blue-600 hover:text-gray-900">
+                                            {{ $ticket->category->name }}
+                                        </button>
+
+                                        @else
+                                            <button @click="openCategoryModal({{ $ticket->id }})" type="button" class="text-blue-600 hover:text-gray-900">
+                                                Choisir Catégorie
+                                            </button>
+                                        @endif
+
                                     <td class="px-6 py-4">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                             @if($ticket->agent) bg-blue-100 text-blue-800 @else bg-yellow-100 text-yellow-800 @endif">
-                                            {{ $ticket->agent ? 'en_cours' : 'en_attente' }}
+                                            {{ $ticket->status }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
@@ -90,7 +108,10 @@
                                                 Assigner
                                             </button>
                                         @else
-                                            {{ $ticket->agent?->name ?? 'Non assigné' }}
+                                            <button @click="openAssign({{ $ticket->id }})" type="button" class="text-indigo-600 hover:text-indigo-900">
+                                                {{ $ticket->agent?->name }}
+                                            </button>
+
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">
@@ -172,10 +193,10 @@
                         @csrf
                         @method('PUT')
                         <select name="status" class="w-full mb-4 rounded-md border-gray-300 p-2">
-                            <option value="en_attente">En attente</option>
-                            <option value="en_cours">En cours</option>
-                            <option value="resolu">Résolu</option>
-                            <option value="close">Close</option>
+                            <option value="open">En attente</option>
+                            <option value="in_progress">En cours</option>
+                            <option value="resolved">Résolu</option>
+                            <option value="closed">Close</option>
 
                         </select>
                         <div class="flex justify-end space-x-2">
@@ -192,5 +213,60 @@
                 </div>
             </div>
         </div>
+
+
+
+        <!-- Modal Choisir une Catégorie -->
+        <div x-show="categoryModal"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-500 bg-opacity-75 overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen">
+                <div @click.away="categoryModal = false" class="bg-white rounded-lg p-8 max-w-md w-full">
+                    <h3 class="text-lg font-medium mb-4">Choisir une Catégorie</h3>
+                    <form method="POST" :action="`/admin/tickets/${currentTicketId}/assign-category`">
+                        @csrf
+                        @method('PUT')
+                        <select name="category_id" class="w-full mb-4 rounded-md border-gray-300 p-2">
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" @click="categoryModal = false"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md">
+                                Annuler
+                            </button>
+                            <button type="submit"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md">
+                                Confirmer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 </x-app-layout>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Succès!',
+                text: "{{ session('success') }}",
+                timer: 3000,
+                showConfirmButton: true
+            }).then(() => {
+                @php session()->forget('success'); @endphp
+            });
+        @endif
+    });
+</script>

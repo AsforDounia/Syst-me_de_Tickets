@@ -109,11 +109,13 @@
                         <template x-if="$store.categoryModal.isEdit">
                             @method('PUT')
                         </template>
+                        <template x-if="$store.categoryModal.isEdit">
+                            <input type="hidden" name="id" x-bind:value="$store.categoryModal.categoryId">
+                        </template>
                         <div class="space-y-4">
                             <div>
                                 <label for="name" class="block text-sm font-medium text-gray-700">Nom</label>
-                                <input type="text" name="name" id="categoryName" required
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200">
+                                <input type="text" name="name" id="categoryName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200">
                             </div>
                             <div>
                                 <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
@@ -149,7 +151,7 @@
                 <div @click.away="$store.deleteModal.close()" class="bg-white rounded-lg p-8 max-w-md w-full">
                     <h3 class="text-lg font-medium mb-4">Confirmer la suppression</h3>
                     <p class="mb-4 text-gray-600">Êtes-vous sûr de vouloir supprimer cette catégorie ?</p>
-                    <form @submit.prevent="submitDeleteForm" :action="`/admin/categories/${$store.deleteModal.categoryId}`" method="POST">
+                    <form :action="`/admin/deleteCategories/${$store.deleteModal.categoryId}`" method="POST">
                         @csrf
                         @method('DELETE')
                         <div class="flex justify-end space-x-2">
@@ -168,3 +170,22 @@
         </div>
     </div>
 </x-app-layout>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Succès!',
+                text: "{{ session('success') }}",
+                timer: 3000,
+                showConfirmButton: true
+            }).then(() => {
+                @php session()->forget('success'); @endphp
+            });
+        @endif
+    });
+</script>
+
+
