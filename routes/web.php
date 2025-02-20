@@ -7,6 +7,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TicketController;
+use App\Models\Ticket;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,7 +47,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
         Route::post('/admin/addCategory', [CategoryController::class, 'store'])->name('admin.addCategory');
-        Route::post('/admin/modifyCategory', [CategoryController::class, 'edit'])->name('admin.modifyCategory');
+        Route::put('/admin/modifyCategory', [CategoryController::class, 'update'])->name('admin.modifyCategory');
+        Route::delete('/admin/deleteCategories/{id}', [CategoryController::class, 'destroy'])->name('admin.destroyCategory');
+        Route::put('admin/tickets/{currentTicketId}/assign-category', [TicketController::class, 'assignCategory'])->name('tickets.assignCategory');
+        Route::put('admin/tickets/{currentTicketId}/assign', [TicketController::class, 'assignAgent'])->name('tickets.assignAgent');
+        Route::put('/admin/tickets/{currentTicketId}/status', [TicketController::class, 'changeStatus'])->name('tickets.changeStatus');
         Route::get('/admin/tickets', [TicketController::class, 'index'])->name('admin.tickets');
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
 
