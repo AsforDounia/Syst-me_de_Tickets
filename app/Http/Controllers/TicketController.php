@@ -59,16 +59,11 @@ class TicketController extends Controller
             'statistics',
             'recentActivity',
             'priorityDistribution',
-            'categoryDistribution',
-            // 'avgResponseTime'
+            'categoryDistribution'
         ));
 
     }
 
-    public function create()
-    {
-        return view('tickets.create');
-    }
 
     public function store(Request $request)
     {
@@ -85,33 +80,7 @@ class TicketController extends Controller
             'status' => 'open',
         ]);
 
-        return redirect()->route('tickets.show', $ticket);
-    }
-
-    public function show(Ticket $ticket)
-    {
-        $this->authorize('view', $ticket);
-        return view('tickets.show', compact('ticket'));
-    }
-
-    // public function changeStatus(Request $request, Ticket $ticket)
-    // {
-    //     // $this->authorize('update', $ticket);
-
-    //     $validated = $request->validate([
-    //         'status' => 'required|in:open,in_progress,resolved,closed'
-    //     ]);
-
-    //     $ticket->update($validated);
-
-    //     return back()->with('success', 'Ticket status updated successfully');
-    // }
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Ticket $ticket)
-    {
-        //
+        return redirect()->route('', $ticket);
     }
 
 
