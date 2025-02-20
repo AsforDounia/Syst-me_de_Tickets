@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
         Route::post('/admin/addCategory', [CategoryController::class, 'store'])->name('admin.addCategory');
+        Route::post('/admin/modifyCategory', [CategoryController::class, 'edit'])->name('admin.modifyCategory');
         Route::get('/admin/tickets', [TicketController::class, 'index'])->name('admin.tickets');
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
 

@@ -104,7 +104,7 @@
             <div class="flex items-center justify-center min-h-screen">
                 <div @click.away="$store.categoryModal.close()" class="bg-white rounded-lg p-8 max-w-md w-full">
                     <h3 x-text="$store.categoryModal.isEdit ? 'Modifier la catégorie' : 'Ajouter une catégorie'" class="text-lg font-medium mb-4"></h3>
-                    <form action="/admin/addCategory" method="POST">
+                    <form x-bind:action="$store.categoryModal.isEdit ? '/admin/modifyCategory' : '/admin/addCategory'" method="POST">
                         @csrf
                         <template x-if="$store.categoryModal.isEdit">
                             @method('PUT')
