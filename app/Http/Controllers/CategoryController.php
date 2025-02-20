@@ -20,29 +20,18 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
         ]);
-
         Category::create([
             'name' => $request->name,
             'description' => $request->description,
         ]);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Category added successfully!');
+        return redirect()->route('admin.categories')->with('success', 'Category added successfully!');
     }
+    
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Category $category)
     {
-        //
+
     }
 
     /**
