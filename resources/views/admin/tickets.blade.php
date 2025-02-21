@@ -216,40 +216,7 @@
 
 
 
-        <!-- Modal Choisir une Catégorie -->
-        <div x-show="categoryModal"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 overflow-y-auto">
-            <div class="flex items-center justify-center min-h-screen">
-                <div @click.away="categoryModal = false" class="bg-white rounded-lg p-8 max-w-md w-full">
-                    <h3 class="text-lg font-medium mb-4">Choisir une Catégorie</h3>
-                    <form method="POST" :action="`/admin/tickets/${currentTicketId}/assign-category`">
-                        @csrf
-                        @method('PUT')
-                        <select name="category_id" class="w-full mb-4 rounded-md border-gray-300 p-2">
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                        <div class="flex justify-end space-x-2">
-                            <button type="button" @click="categoryModal = false"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md">
-                                Annuler
-                            </button>
-                            <button type="submit"
-                                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md">
-                                Confirmer
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+
 
     </div>
 </x-app-layout>

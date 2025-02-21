@@ -14,8 +14,8 @@ class Ticket extends Model
         'status',
         'priority',
         'category_id',
-        'created_by',
-        'assigned_to',
+        'user_id',
+        'agent_id',
         'resolution_time',
     ];
 
@@ -32,7 +32,7 @@ class Ticket extends Model
 
     public function creator()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // public function agent()
@@ -49,7 +49,7 @@ class Ticket extends Model
     {
         return $this->belongsTo(User::class);
     }
-   
+
     public function agent()
     {
         return $this->belongsTo(User::class, 'agent_id'); // Assuming 'agent_id' as the foreign key

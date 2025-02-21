@@ -56,7 +56,7 @@
             </a>
         </li>
             <li>
-                <a href="" class="flex items-center px-6 py-3 text-lg hover:bg-gray-700 rounded">
+                <a href="{{ route('client.tickets') }}" class="flex items-center px-6 py-3 text-lg hover:bg-gray-700 rounded">
                     <i class="fas fa-ticket-alt mr-4"></i> Mes Tickets
                 </a>
             </li>
