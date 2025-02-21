@@ -46,51 +46,15 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="mt-4">
+                            {{ $categories->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Alpine.js Stores -->
-        <script>
-            document.addEventListener('alpine:init', () => {
-                Alpine.store('categoryModal', {
-                    isOpen: false,
-                    isEdit: false,
-                    categoryId: null,
-                    open() {
-                        this.isOpen = true;
-                        this.isEdit = false;
-                        this.categoryId = null;
-                    },
-                    edit(id, name, description) {
-                        this.categoryId = id;
-                        this.isEdit = true;
-                        this.isOpen = true;
-                        // Set form values
-                        setTimeout(() => {
-                            document.getElementById('categoryName').value = name;
-                            document.getElementById('categoryDescription').value = description;
-                        }, 100);
-                    },
-                    close() {
-                        this.isOpen = false;
-                    }
-                });
 
-                Alpine.store('deleteModal', {
-                    isOpen: false,
-                    categoryId: null,
-                    open(id) {
-                        this.categoryId = id;
-                        this.isOpen = true;
-                    },
-                    close() {
-                        this.isOpen = false;
-                    }
-                });
-            });
-        </script>
 
         <!-- Modal Ajouter/Modifier Catégorie -->
         <div x-show="$store.categoryModal.isOpen"
@@ -186,6 +150,43 @@
             });
         @endif
     });
+    document.addEventListener('alpine:init', () => {
+                Alpine.store('categoryModal', {
+                    isOpen: false,
+                    isEdit: false,
+                    categoryId: null,
+                    open() {
+                        this.isOpen = true;
+                        this.isEdit = false;
+                        this.categoryId = null;
+                    },
+                    edit(id, name, description) {
+                        this.categoryId = id;
+                        this.isEdit = true;
+                        this.isOpen = true;
+                        // Set form values
+                        setTimeout(() => {
+                            document.getElementById('categoryName').value = name;
+                            document.getElementById('categoryDescription').value = description;
+                        }, 100);
+                    },
+                    close() {
+                        this.isOpen = false;
+                    }
+                });
+
+                Alpine.store('deleteModal', {
+                    isOpen: false,
+                    categoryId: null,
+                    open(id) {
+                        this.categoryId = id;
+                        this.isOpen = true;
+                    },
+                    close() {
+                        this.isOpen = false;
+                    }
+                });
+            });
 </script>
 
 

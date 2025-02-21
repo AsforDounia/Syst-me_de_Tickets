@@ -22,8 +22,8 @@ class AdminController extends Controller
         $totalUsers = User::count();
         $totalAgents = User::where('role', 'agent')->count();
 
-        $categories = Category::all();
-        $tickets = Ticket::with(['user', 'agent'])->latest()->get();
+        $categories = Category::paginate(5);
+        $tickets = Ticket::with(['user', 'agent'])->latest()->paginate(5);
 
         return view('admin.dashboard', compact(
             'totalTickets',

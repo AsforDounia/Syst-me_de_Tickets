@@ -52,6 +52,15 @@ class TicketController extends Controller
         $categoryDistribution = Ticket::selectRaw('categories.name, COUNT(*) as count')->join('categories', 'tickets.category_id', '=', 'categories.id')->groupBy('categories.name')->get();
 
 
+        $totalTickets = Ticket::count();
+        $openTickets = Ticket::where('status', 'open')->count();
+        $inProgressTickets = Ticket::where('status', 'in_progress')->count();
+        $resolvedTickets = Ticket::where('status', 'resolved')->count();
+        $closedTickets = Ticket::where('status', 'closed')->count();
+
+
+
+
         return view('admin.tickets', compact(
             'tickets',
             'categories',
@@ -59,7 +68,12 @@ class TicketController extends Controller
             'statistics',
             'recentActivity',
             'priorityDistribution',
-            'categoryDistribution'
+            'categoryDistribution',
+            'totalTickets',
+            'openTickets',
+            'inProgressTickets',
+            'resolvedTickets',
+            'closedTickets'
         ));
 
     }
@@ -129,7 +143,7 @@ class TicketController extends Controller
         $agentId = $request->query('agent');
 
         $query = Ticket::with(['category', 'agent', 'user'])
-            ->where('user_id', auth()->id()) // Restrict to authenticated user's tickets
+            ->where('user_id', auth()->id())
             ->latest();
 
         if ($status) {
@@ -216,7 +230,7 @@ class TicketController extends Controller
         if ($ticket->user_id !== auth()->id()) {
             return redirect()->back()->with('error', 'Vous ne pouvez fermer que vos propres tickets.');
         }
-       
+
         if ($ticket->status !== 'resolved') {
             return redirect()->back()->with('error', 'Vous ne pouvez fermer un ticket que s\'il est résolu.');
         }
