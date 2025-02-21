@@ -24,45 +24,34 @@
                 this.categoryModal = true;
         }
     }">
+
+            <!-- Ticket Statistics Section -->
+        <div class="grid grid-cols-1 md:grid-cols-5 mx-8 gap-4 mb-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="text-gray-500">Total Tickets</div>
+                <div class="text-2xl font-bold">{{ $totalTickets }}</div>
+            </div>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="text-gray-500">Open Tickets</div>
+                <div class="text-2xl font-bold text-yellow-600">{{ $openTickets }}</div>
+            </div>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="text-gray-500">In Progress</div>
+                <div class="text-2xl font-bold text-blue-600">{{ $inProgressTickets }}</div>
+            </div>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="text-gray-500">Resolved</div>
+                <div class="text-2xl font-bold text-green-600">{{ $resolvedTickets }}</div>
+            </div>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="text-gray-500">Closed</div>
+                <div class="text-2xl font-bold text-red-600">{{ $closedTickets }}</div>
+            </div>
+        </div>
+
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <!-- Filtres -->
-                    <div x-data="{
-                        status: '',
-                        category: '',
-                        agent: '',
-                        applyFilters() {
-                            console.log('Filtering with:', { status: this.status, category: this.category, agent: this.agent })
-                        }
-                    }" class="mb-6 mx-4 space-y-4 md:space-y-0 flex justify-between md:space-x-4">
-                        <select x-model="status" class="w-1/4 text-center rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            <option value="">Statut</option>
-                            <option value="en_attente">En attente</option>
-                            <option value="en_cours">En cours</option>
-                            <option value="resolu">Résolu</option>
-                            <option value="close">Close</option>
-                        </select>
-
-                        <select x-model="category" class="w-1/4 text-center rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            <option value="">Catégorie</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-
-                        <select x-model="agent" class="w-1/4 text-center rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            <option value="">Agent</option>
-                            @foreach($agents as $agent)
-                                <option value="{{ $agent->id }}">{{ $agent->name }}</option>
-                            @endforeach
-                        </select>
-
-                        <button @click="applyFilters()" type="button" class=" px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Filtrer
-                        </button>
-                    </div>
-
                     <!-- Liste des tickets -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -121,9 +110,9 @@
                                             </button>
                                         @endif --}}
                                         @if(!$ticket->agent)
-                                            <a class="text-red-500 hover:text-red-800 cursor-pointer">
-                                                Close Ticket
-                                            </a>
+                                        <span class="text-gray-400 cursor-not-allowed">
+                                                Ticket is not assigned
+                                        </span>
                                         @else
                                         <button @click="openStatus({{ $ticket->id }})" type="button" class="text-blue-600 hover:text-gray-900">
                                             Changer statut
@@ -136,7 +125,9 @@
                                 @endforeach
                             </tbody>
                         </table>
-
+                        <div class="mt-4">
+                            {{ $tickets->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -216,40 +207,7 @@
 
 
 
-        <!-- Modal Choisir une Catégorie -->
-        <div x-show="categoryModal"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 overflow-y-auto">
-            <div class="flex items-center justify-center min-h-screen">
-                <div @click.away="categoryModal = false" class="bg-white rounded-lg p-8 max-w-md w-full">
-                    <h3 class="text-lg font-medium mb-4">Choisir une Catégorie</h3>
-                    <form method="POST" :action="`/admin/tickets/${currentTicketId}/assign-category`">
-                        @csrf
-                        @method('PUT')
-                        <select name="category_id" class="w-full mb-4 rounded-md border-gray-300 p-2">
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                        <div class="flex justify-end space-x-2">
-                            <button type="button" @click="categoryModal = false"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md">
-                                Annuler
-                            </button>
-                            <button type="submit"
-                                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md">
-                                Confirmer
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+
 
     </div>
 </x-app-layout>

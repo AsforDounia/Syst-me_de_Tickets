@@ -97,11 +97,14 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-4">
+                    {{ $tickets->links() }}
+                </div>
             </div>
 
             <!-- Gestion des tickets -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <div class="flex justify-between items-center mb-4">
+                {{-- <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold">Liste des Tickets</h3>
                     <div class="flex w-1/2 gap-4">
                         <select class="border px-4 py-2 rounded w-full md:w-auto">
@@ -117,8 +120,8 @@
                             <option>Filtrer par Agent</option>
                         </select>
                     </div>
-                </div>
-
+                </div> --}}
+                <h3 class="text-lg font-semibold mb-4">Gestion des Tickets</h3>
                 <table class="min-w-full border border-gray-300">
                     <thead>
                         <tr class="border-b">
@@ -147,6 +150,9 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-4">
+                    {{ $tickets->links() }}
+                </div>
             </div>
         </div>
     </div>

@@ -52,6 +52,15 @@ class TicketController extends Controller
         $categoryDistribution = Ticket::selectRaw('categories.name, COUNT(*) as count')->join('categories', 'tickets.category_id', '=', 'categories.id')->groupBy('categories.name')->get();
 
 
+        $totalTickets = Ticket::count();
+        $openTickets = Ticket::where('status', 'open')->count();
+        $inProgressTickets = Ticket::where('status', 'in_progress')->count();
+        $resolvedTickets = Ticket::where('status', 'resolved')->count();
+        $closedTickets = Ticket::where('status', 'closed')->count();
+
+
+
+
         return view('admin.tickets', compact(
             'tickets',
             'categories',
@@ -60,15 +69,15 @@ class TicketController extends Controller
             'recentActivity',
             'priorityDistribution',
             'categoryDistribution',
-            // 'avgResponseTime'
+            'totalTickets',
+            'openTickets',
+            'inProgressTickets',
+            'resolvedTickets',
+            'closedTickets'
         ));
 
     }
 
-    public function create()
-    {
-        return view('tickets.create');
-    }
 
     public function store(Request $request)
     {
@@ -79,39 +88,16 @@ class TicketController extends Controller
             'priority' => 'required|in:low,medium,high',
         ]);
 
-        $ticket = Ticket::create([
-            ...$validated,
-            'created_by' => auth()->id(),
+        Ticket::create([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'category_id' => $validated['category_id'],
+            'priority' => $validated['priority'],
+            'user_id' => auth()->id(),
             'status' => 'open',
         ]);
 
-        return redirect()->route('tickets.show', $ticket);
-    }
-
-    public function show(Ticket $ticket)
-    {
-        $this->authorize('view', $ticket);
-        return view('tickets.show', compact('ticket'));
-    }
-
-    // public function changeStatus(Request $request, Ticket $ticket)
-    // {
-    //     // $this->authorize('update', $ticket);
-
-    //     $validated = $request->validate([
-    //         'status' => 'required|in:open,in_progress,resolved,closed'
-    //     ]);
-
-    //     $ticket->update($validated);
-
-    //     return back()->with('success', 'Ticket status updated successfully');
-    // }
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Ticket $ticket)
-    {
-        //
+        return redirect()->back()->with('success', 'Ticket ajouté avec succès.');
     }
 
 
@@ -141,7 +127,6 @@ class TicketController extends Controller
 
     public function changeStatus(Request $request, $id)
     {
-        // $this->authorize('update', $ticket);
 
         $validated = $request->validate([
             'status' => 'required|in:open,in_progress,resolved,closed'
@@ -152,6 +137,109 @@ class TicketController extends Controller
         return back()->with('success', 'Ticket status updated successfully');
     }
 
+    public function clientTickets(Request $request){
+        $status = $request->query('status');
+        $categoryId = $request->query('category');
+        $agentId = $request->query('agent');
 
+        $query = Ticket::with(['category', 'agent', 'user'])
+            ->where('user_id', auth()->id())
+            ->latest();
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        if ($agentId) {
+            $query->where('agent_id', $agentId);
+        }
+
+        $tickets = $query->paginate(10);
+
+        $categories = Category::all();
+        $agents = User::where('role', 'agent')->get();
+
+        $statistics = [
+            'total' => Ticket::where('user_id', auth()->id())->count(),
+            'pending' => Ticket::where('user_id', auth()->id())->where('status', 'en_attente')->count(),
+            'in_progress' => Ticket::where('user_id', auth()->id())->where('status', 'en_cours')->count(),
+            'resolved' => Ticket::where('user_id', auth()->id())->where('status', 'resolu')->count(),
+        ];
+
+        $recentActivity = Ticket::with(['user', 'agent'])
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $priorityDistribution = Ticket::selectRaw('priority, COUNT(*) as count')
+            ->where('user_id', auth()->id())
+            ->groupBy('priority')
+            ->get();
+
+        $categoryDistribution = Ticket::selectRaw('categories.name, COUNT(*) as count')
+            ->join('categories', 'tickets.category_id', '=', 'categories.id')
+            ->where('tickets.user_id', auth()->id())
+            ->groupBy('categories.name')
+            ->get();
+
+        return view('client.tickets', compact(
+            'tickets',
+            'categories',
+            'agents',
+            'statistics',
+            'recentActivity',
+            'priorityDistribution',
+            'categoryDistribution'
+        ));
+
+
+        return view('client.tickets', compact('tickets'));
+
+    }
+
+
+    public function update(Request $request)
+    {
+
+        $ticket = Ticket::findOrFail($request->id);
+        if ($ticket->user_id !== auth()->id()) {
+            return redirect()->back()->with('error', 'Vous ne pouvez modifier que vos propres tickets.');
+        }
+
+        if ($ticket->status !== 'open') {
+            return redirect()->back()->with('error', 'Vous ne pouvez modifier un ticket que s\'il est encore ouvert.');
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'priority' => 'required|in:low,medium,high',
+        ]);
+
+        $ticket->update($validated);
+
+        return redirect()->back()->with('success', 'Le ticket a été mis à jour avec succès.');
+    }
+
+    public function close(Request $request){
+        $ticket = Ticket::findOrFail($request->ticket_id);
+        if ($ticket->user_id !== auth()->id()) {
+            return redirect()->back()->with('error', 'Vous ne pouvez fermer que vos propres tickets.');
+        }
+
+        if ($ticket->status !== 'resolved') {
+            return redirect()->back()->with('error', 'Vous ne pouvez fermer un ticket que s\'il est résolu.');
+        }
+
+        $ticket->update(['status' => 'closed' ]);
+
+        return redirect()->back()->with('success', 'Le ticket a été fermé avec succès.');
+
+
+    }
 
 }

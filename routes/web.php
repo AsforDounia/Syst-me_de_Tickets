@@ -63,6 +63,11 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware(['role:client'])->group(function () {
         Route::get('/client/dashboard', [ClientController::class, 'index'])->name('client.dashboard');
+        Route::get('/client/tickets', [TicketController::class, 'clientTickets'])->name('client.tickets');
+        Route::post('/client/addTicket', [TicketController::class, 'store'])->name('tickets.store');
+        Route::put('/client/updateTicket', [TicketController::class, 'update'])->name('tickets.update');
+        Route::put('/client/closeTicket', [TicketController::class, 'close'])->name('client.closeTicket');
+
     });
 });
 
